@@ -74,6 +74,36 @@ app.post("/pecahan",(request,response) => {
     })
 })
 
+// endpoint keempat
+app.post("/nilai", (request, response) => {
+    let nilai = request.body.nilai
+    let tunggal = 0
+    let rata = 0
+    let lulus = []
+    let tidaklulus = []
+
+    for (let i= 0; i < nilai.length; i++) {
+        rata+= (nilai[i].math + nilai[i].english) / 8
+    }
+
+    for (let i= 0; i < nilai.length; i++) {
+        tunggal= (nilai[i].math + nilai[i].english) / 2
+        if (tunggal >= rata  ){
+            lulus.push(nilai[i].nama)
+        }else if (tunggal < rata ) {
+            tidaklulus.push(nilai[i].nama)
+        }
+    }
+
+    return response.json({
+        "lulus" :  lulus,
+        "tidaklulus" : tidaklulus,
+        "rata": rata
+    })
+})
+
+
+
 app.listen(8000, ()=> {
     console.log(`Server runnnnnn bestie on port 8000`);
 })
