@@ -56,6 +56,8 @@ app.post("/bruto",(request,response)=>{
 
 app.post("/word",(request,response)=>{
     let word = request.body.word
+    word = word.toLowerCase()
+    
     let konsonan = 0
     let vokal = 0
 
