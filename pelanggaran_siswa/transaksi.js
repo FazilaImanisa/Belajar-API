@@ -50,7 +50,7 @@ app.post("/pelanggaran_siswa", (req, res) => {
         } else {
             
             // get last inserted id_pelanggaran
-            let lastID = result.insertID
+            let lastID = result.insertId
 
             // prepare data to detail_pelanggan
             let data = []

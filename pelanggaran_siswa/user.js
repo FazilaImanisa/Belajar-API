@@ -81,7 +81,7 @@ app.post("/user", (req, res) => {
     let data = {
         nama_user: req.body.nama_user,
         username: req.body.username,
-        password: req.body.CryptoJS.MD5(password)
+        password: req.body.password
     }
 
     // create sql query insert
@@ -112,7 +112,7 @@ app.put("/user", (req, res) => {
         {
             nama_user: req.body.nama_user,
             username: req.body.username,
-            password: req.body.CryptoJS.MD5(password)
+            password: req.body.password
         },
 
         // parameter (primary key)

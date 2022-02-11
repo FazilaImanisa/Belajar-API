@@ -3,6 +3,7 @@ const express = require("express")
 const bodyParser = require("body-parser")
 const cors = require ("cors")
 const mysql = require("mysql")
+const moment = require("moment")
 
 // implementation
 const app = express()
@@ -26,154 +27,58 @@ db.connect(error => {
     }
 })
 
-// end-point akses data sewa
-app.get("/sewa", (req, res) => {
-    // create sql query
-    let sql = "select * from sewa"
-
-    //run query 
-    db.query(sql, (error, result) => {
-        let response = null
-        if (error) {
-            response = {
-                message: error.message // pesan error
-            }
-        } else {
-            response = {
-                count: result.length, // jumlah data
-                sewa: result // isi data
-            }
-        }
-        res.json(response) // send response
-    })
-})
-
-// end-point akses data sewa id_sewa tertentu
-app.get("/sewa/:id", (req, res) => {
-    let data = {
-        id_sewa: req.params.id
-    }
-
-    // create sql query
-    let sql = "select * from sewa where ?"
-
-    // run query
-    db.query(sql, data, (error, result) => {
-        let response = null
-        if (error) {
-            response = {
-                message: error.message // pesan error
-            }
-        } else {
-            response = {
-                count: result.length, // jumlah data
-                sewa: result
-            }
-        }
-        res.json(response) // send response
-    })
-})
-
-// end-point menyimpan data sewa
+// end-point menambahkan sewa
 app.post("/sewa", (req, res) => {
-
-    // prepare data
+    // prepare data to sewa
     let data = {
         id_sewa: req.body.id_sewa,
-        id_mobil: req.body.id_mobil,
-        id_karyawan: req.body.id_karyawan,
         id_pelanggan: req.body.id_pelanggan,
-        tgl_sewa: req.body.tgl_sewa,
-        tgl_kembali: req.body.tgl_kembali,
-        total_bayar: req.body.total_bayar
+        id_karyawan: req.body.id_karyawan,
+        waktu: moment().format('YYYY-MM-DD HH:mm:ss') // get current time
     }
 
-    // create sql query insert
+    // parse to JSON
+    let sewa = JSON.parse(req.body.sewa)
+
+    // create query insert to sewa
     let sql = "insert into sewa set ?"
 
     // run query
     db.query(sql, data, (error, result) => {
         let response = null
         if (error) {
-            response = {
-                message: error.message
-            }
+            res.json({message: error.message})
         } else {
-            response = {
-                message: result.affectedRows + " data inserted bestie purr"
+            
+            // get last inserted id_sewa
+            let lastID = result.insertId
+
+            // prepare data to sewa
+            let data = []
+            for (let index = 0; index < sewa.length; index++) {
+                data.push([
+                    lastID, sewa[index].id_sewa
+                ])  
             }
+
+            // create query insert sewa
+            let sql = "insert into sewa values ?"
+
+            db.query(sql, [data], (error, result) => {
+                if (error) {
+                    res.json({message: error.message})
+                } else {
+                    res.json({message: "Data has been inserted bestie purr"})
+                }
+            })
         }
-        res.json(response) // send response
     })
 })
 
-// end-point mengubah data sewa
-app.put("/sewa", (req, res) => {
-    
-    // prepare data
-    let data = [
-        // data
-        {
-            id_sewa: req.body.id_sewa,
-            id_mobil: req.body.id_mobil,
-            id_karyawan: req.body.id_karyawan,
-            id_pelanggan: req.body.id_pelanggan,
-            tgl_sewa: req.body.tgl_sewa,
-            tgl_kembali: req.body.tgl_kembali,
-            total_bayar: req.body.total_bayar
-        },
-
-        // parameter (primary key)
-        {
-            id_sewa: req.body.id_sewa
-        }
-    ]
-
-    // create sql query update
-    let sql = "update sewa set ? where ?"
-
-    // run query
-    db.query(sql, data, (error, result) => {
-        let response = null
-        if (error) {
-            response = {
-                message: error.message
-            }
-        } else {
-            response = {
-                message: result.affectedRows + " data updated bestie purr"
-            }
-        }
-        res.json(response) // send response
-    })
+// end-point menampilkan data sewa
+app.get("/sewa", (req, res) => {
+    // create sql query
+    let sql = ""
 })
 
-// end-point menghapus data sewa berdasarkan id_sewa
-app.delete("/sewa/:id", (req, res) => {
-    // prepare data
-    let data = {
-        id_sewa: req.params.id
-    }
-
-    // create query sql delet
-    let sql = "delete from sewa where ?"
-
-    // run query
-    db.query(sql, data, (error, result) => {
-        let response = null
-        if (error) {
-            response = {
-                message: error.message
-            }
-        } else {
-            response = {
-                message: result.affectedRows + " data deleted bestie purr"
-            }
-        }
-        res.json(response) // send response
-    })
-})
-
-app.listen(8000, () => {
-    console.log("Run on port 8000 bestie purr");
-})
+// belom kelar sabar ya ges yak
